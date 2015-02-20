@@ -36,10 +36,12 @@ body {
 }
 
 header {
-    width: 340px;
-    margin: 20px auto;
+    width: 240px;
+    margin: 40px auto 20px;
     text-align: center;
     background: #90D698;
+    border-radius: 16px;
+    padding: 10px 0;
 }
 
 header h1 {
@@ -48,16 +50,16 @@ header h1 {
 
 .board {
     width: 960px;
-    margin: 60px auto;
-
+    margin: 20px auto;
 }
 
 .board ul {
     list-style: none;
-    width: 340px;
+    width: 270px;
     margin: 0 auto;
-    padding: 0;
+    padding: 20px;
     background: #90D698;
+    border-radius: 20px;
 }
 
 .board ul li:nth-child(4), .board ul li:nth-child(7) {
@@ -66,14 +68,13 @@ header h1 {
 
 .square {
     width: 90px;
-    height: 60px;
-    border: 1px black solid;
-    margin: 10px;
+    height: 70px;
+    outline: 1px black solid;
     float: left;
     text-align: center;
-    padding-top: 30px;
     font-size: 2em;
     font-weight: bold;
+    padding-top: 20px;
 }
 
 button {

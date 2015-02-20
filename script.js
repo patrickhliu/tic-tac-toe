@@ -31,6 +31,8 @@ function resetSquareAll() {                                         // Call this
     for (var j=0; j<sqSet.length; j++) {
         resetSquare( sqSet[j] );
     }
+
+    turns = 0;                                                      // re-initialize turns back to 0
 }
 
 // Call this function to check if 3 straight O's occur on the board
