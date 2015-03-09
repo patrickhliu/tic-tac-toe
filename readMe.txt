@@ -5,4 +5,4 @@ Make a tic-tac-toe game in the web browser.
 
 Languages: HTML / CSS / vanilla javascript
 
-Github Page: http://pliu82.github.io/tic_tac_toe/
+Github Page: http://pliu82.github.io/tic-tac-toe
