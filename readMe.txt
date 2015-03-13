@@ -1,8 +1,26 @@
-Tic Tac Toe game from the udemy course "Projects in Javascript/jQuery"
+****************
+Tic Tac Toe
+****************
+The idea for this project comes from: 
+	https://www.udemy.com/projects-in-javascript-jquery/#/	
 
 Project Details:
-Make a tic-tac-toe game in the web browser.
+	Create tic-tac-toe with Javascript
 
-Languages: HTML / CSS / vanilla javascript
+Hosted Link:
+	http://pliu82.github.io/tic-tac-toe
 
-Github Page: http://pliu82.github.io/tic-tac-toe
+Instructions:
+	Plays like the real tic-tac-toe
+
+Languages: 
+	HTML / CSS / Vanilla Javascript
+
+3rd Party Tools: 
+	None
+
+Helpful Resources (many thanks):
+	- the udemy course
+
+Needed Improvements:
+	None
