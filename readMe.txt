@@ -11,7 +11,8 @@ Hosted Link:
 	http://pliu82.github.io/tic-tac-toe
 
 Instructions:
-	Plays like the real tic-tac-toe
+	Plays like the real tic-tac-toe.
+	Press reset button to restart the current game.
 
 Languages: 
 	HTML / CSS / Vanilla Javascript
