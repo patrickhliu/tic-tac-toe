@@ -42,20 +42,149 @@ function didOWin () {
         hasClass( [sq1, sq4, sq7], "o") || hasClass( [sq2, sq5, sq8], "o") || hasClass( [sq3, sq6, sq9], "o")  ||
         hasClass( [sq1, sq5, sq9], "o") || hasClass( [sq3, sq5, sq7], "o") ) {
          alert("O Winsies!!  Press OK to start new game");       // if yes, alert game winner
-         turns = 0;                                              // reset turn count
          resetSquareAll();                                       // reset HTML of all <li> squares
     }
 }
 
 // Call this function to check if 3 straight X's occur on the board
 function didXWin () {
-    if(hasClass( [sq1, sq2, sq3], "x") || hasClass( [sq4, sq5, sq6], "x") || hasClass( [sq7, sq8, sq9], "x")  ||
-       hasClass( [sq1, sq4, sq7], "x") || hasClass( [sq2, sq5, sq8], "x") || hasClass( [sq3, sq6, sq9], "x")  ||
-       hasClass( [sq1, sq5, sq9], "x") || hasClass( [sq3, sq5, sq7], "x") ) {
+    if (hasClass( [sq1, sq2, sq3], "x") || hasClass( [sq4, sq5, sq6], "x") || hasClass( [sq7, sq8, sq9], "x")  ||
+        hasClass( [sq1, sq4, sq7], "x") || hasClass( [sq2, sq5, sq8], "x") || hasClass( [sq3, sq6, sq9], "x")  ||
+        hasClass( [sq1, sq5, sq9], "x") || hasClass( [sq3, sq5, sq7], "x") ) {
             alert("X Winsies!!  Press OK to start new game");       // if yes, alert game winner
-            turns = 0;                                              // reset turn count
             resetSquareAll();                                       // reset HTML of all <li> squares
     }
+}
+
+// possible winning combinations
+var winCombo = [ 
+    { combo: [1, 2, 3], o: null, x: null}, 
+    { combo: [4, 5, 6], o: null, x: null},
+    { combo: [7, 8, 9], o: null, x: null},
+    { combo: [1, 4, 7], o: null, x: null},
+    { combo: [2, 5, 8], o: null, x: null},
+    { combo: [3, 6, 9], o: null, x: null},
+    { combo: [1, 5, 9], o: null, x: null},
+    { combo: [3, 5, 7], o: null, x: null} ]
+
+// random number generator to select random square to mark
+function rand (min,max) {
+    return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+// callback function to collect the indices of O & X squares
+function checkBoard(elem, ind, arr) {
+    if (elem.classList.contains('o') ) {
+        oMatch.push(ind + 1);
+    }
+    else if (elem.classList.contains('x')) {
+        xMatch.push(ind + 1);
+    }
+}
+
+// run on first CPU turn, cpu will choose random square to mark X
+function firstCpuTurn() {
+    var tempNum = rand(1,9);
+
+    if ( !document.querySelector('.sq' + String(tempNum)).classList.contains('disable')  ) {
+        document.querySelector('.sq' + String(tempNum)).textContent = 'x';
+        document.querySelector('.sq' + String(tempNum)).classList.add('disable');
+        document.querySelector('.sq' + String(tempNum)).classList.add('x');
+    }
+    else {
+        firstCpuTurn();
+    }
+}
+
+var oMatch = [];        // array to hold sqSet indices where there is an O marker
+var xMatch = [];        // array to hold sqSet indices where there is an X marker
+
+// function to take care of computers turn
+function compTurn () {  
+    if ( turns === 1 ) {    // if cpu first turn
+        turns++;            // increment turn counter
+        firstCpuTurn();     // mark random square
+        return true;        // return true to exit compTurn();
+    }
+    
+    turns++;                // increment turn counter
+
+    // re-initialize the arrays at start of each turn
+    oMatch = [];
+    xMatch = [];
+    
+    Array.prototype.forEach.call(sqSet, checkBoard );       // call function to fill up oMatch & xMatch arrays (indices of all x's and o's on board)
+    var markFlag = false;                                   // booleans to track status of CPU's board analysis
+    var posFlag = false;
+
+    for (var i = 0; i < winCombo.length; i++ ) {            // for each 3-set (1-2-3, 1-5-9, 3-6-9, etc...)
+        var oMatchCount = 0;                                // count the number of x's and o's
+        var xMatchCount = 0;
+
+        for (var j = 0; j < oMatch.length; j++ ) {                  // count number of o's in current 3-set
+            if ( winCombo[i].combo.indexOf(oMatch[j]) !== -1 ) {    
+                oMatchCount++;                                      
+            }
+        }
+
+        for (var k = 0; k < xMatch.length; k++ ) {                  // count number of x's in current 3-set
+            if ( winCombo[i].combo.indexOf(xMatch[k]) !== -1 ) {    
+                xMatchCount++;                                      
+            }
+        }
+        
+        winCombo[i].o = oMatchCount;    // store the counter values into the object property
+        winCombo[i].x = xMatchCount;
+    }
+
+    var saveIndex = 0;      // variables to store best winning position
+    var saveValue = 0;
+
+    // iterate and analyze the count values of each 3-set...
+    for (var i = 0; i < winCombo.length; i++ ) {                        
+        if ( winCombo[i].x === 2 && winCombo[i].o === 0 ) {     // first chance of 2 x's & 0 o's...save index to go for the win
+            markFlag = true;
+            saveIndex = i;
+            break;
+        }
+    }   
+
+    if (!markFlag) {                                        // if no winning chance, first chance of 2 o's & 0 x's...save index to go for a block
+        for (var i = 0; i < winCombo.length; i++ ) {                        
+            if ( winCombo[i].o === 2 && winCombo[i].x === 0 ) {
+                markFlag = true;
+                saveIndex = i;
+                break;
+            }
+        }       
+    }
+
+    if (!markFlag) {                                        // if neither win / block opportunity, search for best chance 3-set for a win
+        for (var i = 0; i < winCombo.length; i++ ) {                        
+            if ( (winCombo[i].x > saveValue) && winCombo[i].o === 0 ) {     // most # of X's with zero O's in that 3-set
+                saveIndex = i;                              // save index to process below
+                saveValue = winCombo[i].x;                  // save value so you know what value you have to beat in the if condition
+                posFlag = true;
+            }
+        }       
+    }
+
+    // if both flags still false, then nothing was marked (no winning chance & no chance to block & best 3-set not found)
+    // so mark a random square
+    if (!posFlag && !markFlag) {     
+        firstCpuTurn();
+    }
+    // else something was found, mark an available square in that 3-set
+    else { 
+        for (var n = 0; n < winCombo[saveIndex].combo.length; n++) {
+            if ( !document.querySelector('.sq' + String(winCombo[saveIndex].combo[n])).classList.contains('disable')  ) {
+                document.querySelector('.sq' + String(winCombo[saveIndex].combo[n])).textContent = 'x';            // mark X for the win
+                document.querySelector('.sq' + String(winCombo[saveIndex].combo[n])).classList.add('disable');
+                document.querySelector('.sq' + String(winCombo[saveIndex].combo[n])).classList.add('x');
+                break;
+            }
+        }       
+    }   
 }
 
 gameBoard.addEventListener('click', checkGameProgress, false);      // event handler for click on the game board container
@@ -65,26 +194,24 @@ function checkGameProgress(e) {
         if (  hasClass( [e.target], "disable") ) {                  // if user clicks on an already marked square, alert user
             alert("That square is already marked..");
         }
-        else if ( turns % 2 === 0 ) {                               // if turn count is even...
-            turns++;
-            e.target.textContent = "o";                             // set element's inner text to "O"
-            e.target.classList.add('disable');                      // add class "disable" as a flag indicating square can't be marked again
-            e.target.classList.add('o');                            // add class "o", just changes background color
-            didOWin();
-        }
-        else if ( turns % 2 === 1 ) {                               // if turn count is odd...
-            turns++;                                                
-            e.target.textContent = "x";                             // set inner text of element to "X"
-            e.target.classList.add('disable');                      // add class "disable" as a flag indicating square can't be marked again
-            e.target.classList.add('x');                            // add class "x", just changes background color
-            didXWin();
-        }
-
-        if ( turns === 9) {                                         // if turn count is 9, declare tie game
-            alert("Tie Game! Press OK to start a new game");
-            turns = 0;
-            resetSquareAll();
-        }       
+        else {                                                      // else mark as O 
+            turns++;        
+            e.target.textContent = "o";                             
+            e.target.classList.add('disable');                      
+            e.target.classList.add('o');                            
+            didOWin();                                              // check if O won...
+            
+            if ( turns < 9 && turns !== 0 ) {                       // if tie game not reached & no one has won yet...
+                setTimeout( function() {
+                    compTurn();                                     // CPU takes turn
+                    didXWin();                                      // check if X won...
+                }, 500);    
+            }
+            else if ( turns === 9) {                                // if turn count is 9, declare tie game
+                alert("Tie Game! Press OK to start a new game");
+                resetSquareAll();
+            }
+        }          
     }
 
     e.stopPropagation();                                            // stop event propogation
